@@ -8,16 +8,18 @@ namespace ProductsApi.Repos
     public class CategoryRepository : ICategoryRepository
     {
         private readonly ApiDbContext _context;
-        private readonly IMapper _mapper;
         public CategoryRepository(ApiDbContext context, IMapper mapper)
         {
             _context = context;
-            _mapper = mapper;
         }
 
         public async Task<Category> CreateCategoryAsync(Category category)
         {
-            var newCategory = _mapper.Map<Category>(category);
+            var newCategory = new Category
+            {
+                Name = category.Name,
+                Description = category.Description
+            };
             await _context.Categories.AddAsync(newCategory);
             await _context.SaveChangesAsync();
             return newCategory;
@@ -26,54 +28,33 @@ namespace ProductsApi.Repos
         public async Task DeleteCategoryAsync(int id)
         {
             var category = await _context.Categories.FindAsync(id);
-            if (category != null)
-            {
-                _context.Categories.Remove(category);
-                await _context.SaveChangesAsync();
-            }
+            _context.Categories.Remove(category);
+            await _context.SaveChangesAsync();
+
         }
 
         public async Task<List<Category>> GetAllCategoriesAsync()
         {
-            var categories = await _mapper.ProjectTo<Category>(_context.Categories).ToListAsync();
+            var categories = await _context.Categories.ToListAsync();
             return categories;
 
         }
 
-        public async Task<Category?> GetCategoryByIdAsync(int id)
+        public async Task<Category> GetCategoryByIdAsync(int id)
         {
-            var category = await _mapper.ProjectTo<Category>(_context.Categories.Where(c => c.Id == id)).FirstOrDefaultAsync();
-
-            try
-            {
-                if (category == null)
-                {
-                    throw new Exception($"Category with id {id} not found.");
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
+            var category = await _context.Categories.FindAsync(id);
             return category;
         }
 
-        public async Task<Category?> UpdateCategoryAsync(int id, Category category)
+        public async Task<Category> UpdateCategoryAsync(int id, Category category)
         {
-            var existingCategory = await _mapper.ProjectTo<Category>(_context.Categories.Where(c => c.Id == id)).FirstOrDefaultAsync();
+            var existingCategory = await _context.Categories.FindAsync(id);
+            existingCategory.Name = category.Name;
+            existingCategory.Description = category.Description;
+            _context.Categories.Update(existingCategory);
+            await _context.SaveChangesAsync();
+            return existingCategory;
 
-            if (existingCategory != null)
-            {
-                existingCategory.Name = category.Name;
-                existingCategory.Description = category.Description;
-                _context.Categories.Update(existingCategory);
-                await _context.SaveChangesAsync();
-                return existingCategory;
-            }
-            else
-            {
-                throw new Exception($"Category with id {id} not found.");
-            }
         }
 
     }

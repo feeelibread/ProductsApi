@@ -8,15 +8,19 @@ namespace ProductsApi.Repos
     public class ProductRepository : IProductRepository
     {
         private readonly ApiDbContext _context;
-        private readonly IMapper _mapper;
         public ProductRepository(ApiDbContext context, IMapper mapper)
         {
             _context = context;
-            _mapper = mapper;
         }
         public async Task<Product> CreateProductAsync(Product product)
         {
-            var newProduct = _mapper.Map<Product>(product);
+            var newProduct = new Product
+            {
+                Name = product.Name,
+                Description = product.Description,
+                Price = product.Price,
+                CategoryId = product.CategoryId
+            };
             await _context.Products.AddAsync(newProduct);
             await _context.SaveChangesAsync();
             return newProduct;
@@ -24,57 +28,28 @@ namespace ProductsApi.Repos
 
         public async Task<List<Product>> GetAllProductsAsync()
         {
-            var products = await _mapper.ProjectTo<Product>(_context.Products).ToListAsync();
+            var products = await _context.Products.ToListAsync();
             return products;
         }
 
         public async Task<Product?> GetProductByIdAsync(Guid id)
         {
-            var product = await _mapper.ProjectTo<Product>(_context.Products.Where(p => p.Id == id)).FirstOrDefaultAsync();
-
-            try
-            {
-                if (product == null)
-                {
-                    throw new Exception($"Product with id {id} not found.");
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
+            var product = await _context.Products.FindAsync(id);
             return product;
         }
 
         public async Task DeleteProductAsync(Guid id)
         {
             var product = await _context.Products.FindAsync(id);
-            if (product != null)
-            {
-                _context.Products.Remove(product);
-                await _context.SaveChangesAsync();
-            }
-            else
-            {
-                throw new Exception($"Product with id {id} not found.");
-            }
+            _context.Products.Remove(product);
+            await _context.SaveChangesAsync();
         }
 
-        public async Task<Product?> UpdateProductAsync(Guid id, Product product)
+        public async Task UpdateProductAsync(Guid id, Product product)
         {
-            var existingProduct = await _mapper.ProjectTo<Product>(_context.Products.Where(p => p.Id == id)).FirstOrDefaultAsync();
-
-            if (existingProduct != null)
-            {
-                _mapper.Map(product, existingProduct);
-                await _context.SaveChangesAsync();
-                return existingProduct;
-            }
-            else
-            {
-                throw new Exception($"Product with id {id} not found.");
-            }
-
+            var existingProduct = await _context.Products.FindAsync(id);
+            _context.Products.Update(existingProduct);
+            await _context.SaveChangesAsync();
         }
     }
 }
