@@ -7,7 +7,7 @@ using ProductsApi.Models;
 
 namespace ProductsApi.Data.Context
 {
-    public class ProductsDbContext(DbContextOptions<ProductsDbContext> options) : DbContext(options)
+    public class ApiDbContext(DbContextOptions<ApiDbContext> options) : DbContext(options)
     {
         public DbSet<Product> Products { get; set; } = null!;
         public DbSet<Category> Categories { get; set; } = null!;
