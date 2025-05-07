@@ -14,7 +14,7 @@ namespace ProductsApi.Mappings
         public CategoryProfile()
         {
             //Request to Model
-            CreateMap<CreateCategoryDto, Category>();
+            CreateMap<Category, CreateCategoryDto>().ReverseMap();
 
             //Model to Response
             CreateMap<Category, CategoryResponse>()

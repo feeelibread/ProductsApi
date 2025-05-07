@@ -20,14 +20,6 @@ namespace ProductsApi.Repos
             return category;
         }
 
-        public async Task DeleteCategoryAsync(int id)
-        {
-            var category = await _context.Categories.FindAsync(id);
-            _context.Categories.Remove(category);
-            await _context.SaveChangesAsync();
-
-        }
-
         public async Task<List<Category>> GetAllCategoriesAsync()
         {
             var categories = await _context.Categories.ToListAsync();
@@ -49,5 +41,12 @@ namespace ProductsApi.Repos
             return existingCategory;
         }
 
+        public async Task DeleteCategoryAsync(int id)
+        {
+            var category = await _context.Categories.FindAsync(id);
+            _context.Categories.Remove(category);
+            await _context.SaveChangesAsync();
+
+        }
     }
 }

@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using ProductsApi.DTOs.Requests;
 using ProductsApi.DTOs.Responses;
+using ProductsApi.Models;
 using ProductsApi.Services;
 
 namespace ProductsApi.Controllers
@@ -48,8 +49,15 @@ namespace ProductsApi.Controllers
         [HttpPost("CreateCategory")]
         public async Task<IActionResult> CreateCategory([FromBody] CreateCategoryDto categoryDto)
         {
-            var category = await _categoryService.CreateCategoryAsync(categoryDto);
+            var existingCategories = await _categoryService.GetAllCategoriesAsync();
+            if (existingCategories.Any(c => c.Name.Equals(categoryDto.Name, StringComparison.OrdinalIgnoreCase)))
+            {
+                return BadRequest("Category with the same name already exists.");
+            }
+            var category = _mapper.Map<Category>(categoryDto);
+            await _categoryService.CreateCategoryAsync(categoryDto);
             var categoryResponse = _mapper.Map<CategoryResponse>(category);
+
             if (category == null)
             {
                 return BadRequest("Category creation failed.");

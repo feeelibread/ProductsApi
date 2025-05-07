@@ -14,7 +14,7 @@ namespace ProductsApi.Mappings
         public ProductProfile()
         {
             //Request to Model
-            CreateMap<CreateProductDto, Product>();
+            CreateMap<Product, CreateProductDto>().ReverseMap();
 
             //Model to Response
             CreateMap<Product, ProductResponse>()
