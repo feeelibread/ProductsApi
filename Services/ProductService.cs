@@ -1,0 +1,77 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using AutoMapper;
+using ProductsApi.DTOs.Requests;
+using ProductsApi.DTOs.Responses;
+using ProductsApi.Models;
+using ProductsApi.Repos;
+
+namespace ProductsApi.Services
+{
+    public class ProductService
+    {
+        //TODO: Improve error handling
+        private readonly IProductRepository _productRepository;
+        private readonly IMapper _mapper;
+        public ProductService(IProductRepository productRepository, IMapper mapper)
+        {
+            _productRepository = productRepository;
+            _mapper = mapper;
+        }
+
+        public async Task<List<ProductResponse>> GetAllProductsAsync()
+        {
+            var products = await _productRepository.GetAllProductsAsync();
+            var productDtos = _mapper.Map<List<ProductResponse>>(products);
+            return productDtos;
+        }
+
+        public async Task<ProductResponse> GetProductByIdAsync(Guid id)
+        {
+            var product = await _productRepository.GetProductByIdAsync(id);
+            if (product == null)
+            {
+                throw new Exception("Product not found.");
+            }
+            var productDto = _mapper.Map<ProductResponse>(product);
+            return productDto;
+        }
+        public async Task<CreateProductDto> CreateProductAsync(CreateProductDto productDto)
+        {
+            // Check if the product already exists
+            var existingProduct = await _productRepository.GetAllProductsAsync();
+            if (existingProduct.Any(p => p.Name == productDto.Name && p.CategoryId == productDto.CategoryId))
+            {
+                throw new Exception("Product already exists in the specified category.");
+            }
+
+            var product = _mapper.Map<Product>(productDto);
+            var createdProduct = await _productRepository.CreateProductAsync(product);
+            var createdProductDto = _mapper.Map<CreateProductDto>(createdProduct);
+            return createdProductDto;
+        }
+
+        public async Task UpdateProductAsync(Guid id, CreateProductDto productDto)
+        {
+            var product = await _productRepository.GetProductByIdAsync(id);
+            if (product == null)
+            {
+                throw new Exception("Product not found.");
+            }
+            var updatedProduct = _mapper.Map<Product>(productDto);
+            await _productRepository.UpdateProductAsync(id, updatedProduct);
+        }
+        public async Task DeleteProductAsync(Guid id)
+        {
+            var product = await _productRepository.GetProductByIdAsync(id);
+            if (product == null)
+            {
+                throw new Exception("Product not found.");
+            }
+            await _productRepository.DeleteProductAsync(id);
+
+        }
+    }
+}

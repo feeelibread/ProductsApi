@@ -14,16 +14,9 @@ namespace ProductsApi.Repos
         }
         public async Task<Product> CreateProductAsync(Product product)
         {
-            var newProduct = new Product
-            {
-                Name = product.Name,
-                Description = product.Description,
-                Price = product.Price,
-                CategoryId = product.CategoryId
-            };
-            await _context.Products.AddAsync(newProduct);
+            await _context.Products.AddAsync(product);
             await _context.SaveChangesAsync();
-            return newProduct;
+            return product;
         }
 
         public async Task<List<Product>> GetAllProductsAsync()

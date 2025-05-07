@@ -15,14 +15,9 @@ namespace ProductsApi.Repos
 
         public async Task<Category> CreateCategoryAsync(Category category)
         {
-            var newCategory = new Category
-            {
-                Name = category.Name,
-                Description = category.Description
-            };
-            await _context.Categories.AddAsync(newCategory);
+            await _context.Categories.AddAsync(category);
             await _context.SaveChangesAsync();
-            return newCategory;
+            return category;
         }
 
         public async Task DeleteCategoryAsync(int id)
@@ -49,12 +44,9 @@ namespace ProductsApi.Repos
         public async Task<Category> UpdateCategoryAsync(int id, Category category)
         {
             var existingCategory = await _context.Categories.FindAsync(id);
-            existingCategory.Name = category.Name;
-            existingCategory.Description = category.Description;
             _context.Categories.Update(existingCategory);
             await _context.SaveChangesAsync();
             return existingCategory;
-
         }
 
     }
