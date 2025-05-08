@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
 using ProductsApi.DTOs.Requests;
 using ProductsApi.DTOs.Responses;
 using ProductsApi.Models;
@@ -14,9 +15,11 @@ namespace ProductsApi.Services
     {
         //TODO: Improve error handling
         private readonly IProductRepository _productRepository;
+        private readonly CategoryService _categoryService;
         private readonly IMapper _mapper;
-        public ProductService(IProductRepository productRepository, IMapper mapper)
+        public ProductService(IProductRepository productRepository, IMapper mapper, CategoryService categoryService)
         {
+            _categoryService = categoryService;
             _productRepository = productRepository;
             _mapper = mapper;
         }
@@ -36,6 +39,7 @@ namespace ProductsApi.Services
                 throw new Exception("Product not found.");
             }
             var productDto = _mapper.Map<ProductResponse>(product);
+
             return productDto;
         }
         public async Task<CreateProductDto> CreateProductAsync(CreateProductDto productDto)
@@ -47,10 +51,18 @@ namespace ProductsApi.Services
                 throw new Exception("Product already exists in the specified category.");
             }
 
+            // Check if the category exists
+            var categoryExists = await _categoryService.CategoryExistsAsync(productDto.CategoryId);
+            if (!categoryExists)
+            {
+                throw new Exception("Category does not exist.");
+            }
+
             var product = _mapper.Map<Product>(productDto);
             var createdProduct = await _productRepository.CreateProductAsync(product);
-            var createdProductDto = _mapper.Map<CreateProductDto>(createdProduct);
-            return createdProductDto;
+            var productResponse = _mapper.Map<CreateProductDto>(createdProduct);
+            return productResponse;
+
         }
 
         public async Task UpdateProductAsync(Guid id, CreateProductDto productDto)

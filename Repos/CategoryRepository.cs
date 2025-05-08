@@ -8,7 +8,7 @@ namespace ProductsApi.Repos
     public class CategoryRepository : ICategoryRepository
     {
         private readonly ApiDbContext _context;
-        public CategoryRepository(ApiDbContext context, IMapper mapper)
+        public CategoryRepository(ApiDbContext context)
         {
             _context = context;
         }
@@ -22,14 +22,14 @@ namespace ProductsApi.Repos
 
         public async Task<List<Category>> GetAllCategoriesAsync()
         {
-            var categories = await _context.Categories.ToListAsync();
+            var categories = await _context.Categories.Include(c => c.Products).ToListAsync();
             return categories;
 
         }
 
         public async Task<Category> GetCategoryByIdAsync(int id)
         {
-            var category = await _context.Categories.FindAsync(id);
+            var category = await _context.Categories.Include(c => c.Products).FirstOrDefaultAsync(c => c.Id == id);
             return category;
         }
 
@@ -47,6 +47,10 @@ namespace ProductsApi.Repos
             _context.Categories.Remove(category);
             await _context.SaveChangesAsync();
 
+        }
+        public async Task<bool> CategoryExistsAsync(int id)
+        {
+            return await _context.Categories.AnyAsync(c => c.Id == id);
         }
     }
 }

@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using ProductsApi.DTOs.Requests;
 using ProductsApi.DTOs.Responses;
+using ProductsApi.Models;
 using ProductsApi.Services;
 
 namespace ProductsApi.Controllers
@@ -26,11 +27,19 @@ namespace ProductsApi.Controllers
         [HttpPost("CreateProduct")]
         public async Task<IActionResult> CreateProduct([FromBody] CreateProductDto productDto)
         {
-            var product = await _productService.CreateProductAsync(productDto);
+            var existingProducts = await _productService.GetAllProductsAsync();
+            if (existingProducts.Any(c => c.Name.Equals(productDto.Name, StringComparison.OrdinalIgnoreCase)))
+            {
+                return BadRequest("Product with the same name already exists.");
+            }
+            var product = _mapper.Map<Product>(productDto);
+            await _productService.CreateProductAsync(productDto);
+
             var productResponse = _mapper.Map<ProductResponse>(product);
+
             if (product == null)
             {
-                return BadRequest("Product creation failed.");
+                return BadRequest("Category creation failed.");
             }
             return CreatedAtAction(nameof(GetProductById), new { id = productResponse.Id }, product);
         }
@@ -80,7 +89,5 @@ namespace ProductsApi.Controllers
             await _productService.DeleteProductAsync(id);
             return NoContent();
         }
-
-
     }
 }

@@ -36,6 +36,12 @@ namespace ProductsApi.Services
         }
         public async Task<CreateCategoryDto> CreateCategoryAsync(CreateCategoryDto categoryDto)
         {
+            // Check if the category already exists
+            var existingCategories = await _categoryRepository.GetAllCategoriesAsync();
+            if (existingCategories.Any(c => c.Name.Equals(categoryDto.Name, StringComparison.OrdinalIgnoreCase)))
+            {
+                throw new Exception("Category with the same name already exists.");
+            }
             var category = _mapper.Map<Category>(categoryDto);
             var createdCategory = await _categoryRepository.CreateCategoryAsync(category);
             return _mapper.Map<CreateCategoryDto>(createdCategory);
@@ -58,6 +64,11 @@ namespace ProductsApi.Services
                 throw new Exception("Category not found.");
             }
             await _categoryRepository.DeleteCategoryAsync(id);
+        }
+
+        public async Task<bool> CategoryExistsAsync(int id)
+        {
+            return await _categoryRepository.CategoryExistsAsync(id);
         }
 
 

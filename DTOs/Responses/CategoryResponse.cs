@@ -9,7 +9,7 @@ namespace ProductsApi.DTOs.Responses
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public List<ProductResponse> Products { get; set; } = new List<ProductResponse>();
+        public List<string> Products { get; set; }
         public string Description { get; set; }
 
     }

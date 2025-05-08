@@ -18,17 +18,7 @@ namespace ProductsApi.Mappings
 
             //Model to Response
             CreateMap<Category, CategoryResponse>()
-                .ForMember(dest => dest.Products, opt => opt.MapFrom(src => src.Products.Select(p => new ProductResponse
-                {
-                    Id = p.Id,
-                    Name = p.Name,
-                    Description = p.Description,
-                    Price = p.Price,
-                    Quantity = p.Quantity,
-                    CategoryId = src.Id,
-                    CategoryName = src.Name,
-                    CategoryDescription = src.Description
-                })));
+                .ForMember(dest => dest.Products, opt => opt.MapFrom(src => src.Products.Select(p => p.Name).ToList()));
         }
     }
 }

@@ -21,13 +21,13 @@ namespace ProductsApi.Repos
 
         public async Task<List<Product>> GetAllProductsAsync()
         {
-            var products = await _context.Products.ToListAsync();
+            var products = await _context.Products.Include(p => p.Category).ToListAsync();
             return products;
         }
 
         public async Task<Product?> GetProductByIdAsync(Guid id)
         {
-            var product = await _context.Products.FindAsync(id);
+            var product = await _context.Products.Include(p => p.Category).FirstOrDefaultAsync(p => p.Id == id);
             return product;
         }
 

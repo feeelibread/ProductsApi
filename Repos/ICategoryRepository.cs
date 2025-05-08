@@ -9,5 +9,6 @@ namespace ProductsApi.Repos
         Task<Category> CreateCategoryAsync(Category category);
         Task<Category> UpdateCategoryAsync(int id, Category category);
         Task DeleteCategoryAsync(int id);
+        Task<bool> CategoryExistsAsync(int id);
     }
 }

@@ -22,6 +22,7 @@ builder.Services.AddSwaggerGen(c =>
 
 builder.Services.AddControllers();
 builder.Services.AddAutoMapper(typeof(Program).Assembly);
+builder.Services.AddEndpointsApiExplorer();
 
 var app = builder.Build();
 

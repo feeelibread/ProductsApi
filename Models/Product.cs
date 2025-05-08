@@ -12,8 +12,7 @@ namespace ProductsApi.Models
         public string Description { get; set; } = string.Empty;
         public decimal Price { get; set; }
         public int Quantity { get; set; }
-
         public int CategoryId { get; set; }
-        public Category Category { get; set; } = new Category();
+        public Category Category { get; set; }
     }
 }
