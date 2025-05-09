@@ -24,6 +24,25 @@ namespace ProductsApi.Controllers
             _mapper = mapper;
         }
 
+        [HttpPost("CreateCategory")]
+        public async Task<IActionResult> CreateCategory([FromBody] CreateCategoryDto categoryDto)
+        {
+            var existingCategories = await _categoryService.GetAllCategoriesAsync();
+            if (existingCategories.Any(c => c.Name.Equals(categoryDto.Name, StringComparison.OrdinalIgnoreCase)))
+            {
+                return BadRequest("Category with the same name already exists.");
+            }
+            var category = _mapper.Map<Category>(categoryDto);
+            await _categoryService.CreateCategoryAsync(categoryDto);
+            var categoryResponse = _mapper.Map<CategoryResponse>(category);
+
+            if (category == null)
+            {
+                return BadRequest("Category creation failed.");
+            }
+            return CreatedAtAction(nameof(GetCategoryById), new { id = categoryResponse.Id }, category);
+        }
+
         [HttpGet("GetAllCategories")]
         public async Task<IActionResult> GetAllCategories()
         {
@@ -45,24 +64,16 @@ namespace ProductsApi.Controllers
             }
             return Ok(category);
         }
-
-        [HttpPost("CreateCategory")]
-        public async Task<IActionResult> CreateCategory([FromBody] CreateCategoryDto categoryDto)
+        [HttpGet("GetCategoryByName/{name}")]
+        public async Task<IActionResult> GetCategoryByName(string name)
         {
-            var existingCategories = await _categoryService.GetAllCategoriesAsync();
-            if (existingCategories.Any(c => c.Name.Equals(categoryDto.Name, StringComparison.OrdinalIgnoreCase)))
-            {
-                return BadRequest("Category with the same name already exists.");
-            }
-            var category = _mapper.Map<Category>(categoryDto);
-            await _categoryService.CreateCategoryAsync(categoryDto);
-            var categoryResponse = _mapper.Map<CategoryResponse>(category);
-
+            var categories = await _categoryService.GetAllCategoriesAsync();
+            var category = categories.FirstOrDefault(c => c.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
             if (category == null)
             {
-                return BadRequest("Category creation failed.");
+                return NotFound($"Category with name {name} not found.");
             }
-            return CreatedAtAction(nameof(GetCategoryById), new { id = categoryResponse.Id }, category);
+            return Ok(category);
         }
 
         [HttpPut("UpdateCategory/{id}")]
@@ -87,18 +98,6 @@ namespace ProductsApi.Controllers
             }
             await _categoryService.DeleteCategoryAsync(id);
             return NoContent();
-        }
-
-        [HttpGet("GetCategoryByName/{name}")]
-        public async Task<IActionResult> GetCategoryByName(string name)
-        {
-            var categories = await _categoryService.GetAllCategoriesAsync();
-            var category = categories.FirstOrDefault(c => c.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
-            if (category == null)
-            {
-                return NotFound($"Category with name {name} not found.");
-            }
-            return Ok(category);
         }
     }
 }

@@ -66,6 +66,18 @@ namespace ProductsApi.Controllers
             return Ok(product);
         }
 
+        [HttpGet("GetProductByName/{name}")]
+        public async Task<IActionResult> GetProductByName(string name)
+        {
+            var products = await _productService.GetAllProductsAsync();
+            var product = products.FirstOrDefault(p => p.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+            if (product == null)
+            {
+                return NotFound($"Product with name {name} not found.");
+            }
+            return Ok(product);
+        }
+
         [HttpPut("UpdateProduct/{id}")]
         public async Task<IActionResult> UpdateProduct(Guid id, [FromBody] UpdateProductDto productDto)
         {
