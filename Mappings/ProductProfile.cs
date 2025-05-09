@@ -27,9 +27,6 @@ namespace ProductsApi.Mappings
                 .ForMember(dest => dest.CategoryId, opt => opt.MapFrom(src => src.Category.Id))
                 .ForMember(dest => dest.CategoryName, opt => opt.MapFrom(src => src.Category.Name))
                 .ForMember(dest => dest.CategoryDescription, opt => opt.MapFrom(src => src.Category.Description));
-
-
-
         }
     }
 }
