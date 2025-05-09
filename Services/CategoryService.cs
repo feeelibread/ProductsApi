@@ -46,15 +46,16 @@ namespace ProductsApi.Services
             var createdCategory = await _categoryRepository.CreateCategoryAsync(category);
             return _mapper.Map<CreateCategoryDto>(createdCategory);
         }
-        public async Task UpdateCategoryAsync(int id, CreateCategoryDto categoryDto)
+        public async Task UpdateCategoryAsync(int id, UpdateCategoryDto categoryDto)
         {
             var category = await _categoryRepository.GetCategoryByIdAsync(id);
             if (category == null)
             {
                 throw new Exception("Category not found.");
             }
-            var updatedCategory = _mapper.Map<Category>(categoryDto);
-            await _categoryRepository.UpdateCategoryAsync(id, updatedCategory);
+            _mapper.Map(categoryDto, category);
+            await _categoryRepository.UpdateCategoryAsync(id, category);
+
         }
         public async Task DeleteCategoryAsync(int id)
         {

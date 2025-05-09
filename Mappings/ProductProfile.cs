@@ -15,6 +15,7 @@ namespace ProductsApi.Mappings
         {
             //Request to Model
             CreateMap<CreateProductDto, Product>().ReverseMap();
+            CreateMap<UpdateProductDto, Product>();
 
             //Model to Response
             CreateMap<Product, ProductResponse>()
@@ -26,6 +27,8 @@ namespace ProductsApi.Mappings
                 .ForMember(dest => dest.CategoryName, opt => opt.MapFrom(src => src.Category.Name))
                 .ForMember(dest => dest.CategoryDescription, opt => opt.MapFrom(src => src.Category.Description))
                 .ForMember(dest => dest.CategoryId, opt => opt.MapFrom(src => src.Category.Id));
+
+
         }
     }
 }

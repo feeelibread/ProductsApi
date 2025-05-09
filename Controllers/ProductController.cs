@@ -67,7 +67,7 @@ namespace ProductsApi.Controllers
         }
 
         [HttpPut("UpdateProduct/{id}")]
-        public async Task<IActionResult> UpdateProduct(Guid id, [FromBody] CreateProductDto productDto)
+        public async Task<IActionResult> UpdateProduct(Guid id, [FromBody] UpdateProductDto productDto)
         {
             var product = await _productService.GetProductByIdAsync(id);
             if (product == null)

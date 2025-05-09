@@ -15,6 +15,7 @@ namespace ProductsApi.Mappings
         {
             //Request to Model
             CreateMap<Category, CreateCategoryDto>().ReverseMap();
+            CreateMap<Category, UpdateCategoryDto>().ReverseMap();
 
             //Model to Response
             CreateMap<Category, CategoryResponse>()

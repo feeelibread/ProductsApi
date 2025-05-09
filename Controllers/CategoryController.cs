@@ -66,7 +66,7 @@ namespace ProductsApi.Controllers
         }
 
         [HttpPut("UpdateCategory/{id}")]
-        public async Task<IActionResult> UpdateCategory(int id, [FromBody] CreateCategoryDto categoryDto)
+        public async Task<IActionResult> UpdateCategory(int id, [FromBody] UpdateCategoryDto categoryDto)
         {
             var category = await _categoryService.GetCategoryByIdAsync(id);
             if (category == null)

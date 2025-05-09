@@ -65,15 +65,15 @@ namespace ProductsApi.Services
 
         }
 
-        public async Task UpdateProductAsync(Guid id, CreateProductDto productDto)
+        public async Task UpdateProductAsync(Guid id, UpdateProductDto productDto)
         {
             var product = await _productRepository.GetProductByIdAsync(id);
             if (product == null)
             {
                 throw new Exception("Product not found.");
             }
-            var updatedProduct = _mapper.Map<Product>(productDto);
-            await _productRepository.UpdateProductAsync(id, updatedProduct);
+            _mapper.Map(productDto, product);
+            await _productRepository.UpdateProductAsync(id, product);
         }
         public async Task DeleteProductAsync(Guid id)
         {
