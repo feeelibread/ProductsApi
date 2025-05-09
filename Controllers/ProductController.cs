@@ -52,7 +52,7 @@ namespace ProductsApi.Controllers
             {
                 return NotFound("No products found.");
             }
-            return Ok(products);
+            return Ok(products.OrderBy(p => p.CategoryId));
         }
 
         [HttpGet("GetProductById/{id}")]
